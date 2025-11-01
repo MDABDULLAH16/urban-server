@@ -2,7 +2,7 @@
 
 import express from "express";
 import cors from "cors";
-import { MongoClient, ServerApiVersion } from "mongodb";
+import { MongoClient, ObjectId, ServerApiVersion } from "mongodb";
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -22,7 +22,9 @@ const client = new MongoClient(uri, {
 const urbanDB = client.db("urbanDB");
 const productRequest = urbanDB.collection("productRequest");
 const products = urbanDB.collection("products");
-
+app.get("/", (req, res) => {
+  res.send("Urban is Running!!");
+});
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -41,6 +43,22 @@ async function run() {
     app.post("/productRequest", async (req, res) => {
       const newProduct = req.body;
       const result = await productRequest.insertOne(newProduct);
+      res.send(result);
+    });
+    app.get("/productRequest", async (req, res) => {
+      const email = req.query.email;
+      const query = {};
+      if (email) {
+        query.email = email;
+      }
+      const cursor = productRequest.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    app.delete("/productRequest/:_id", async (req, res) => {
+      const id = req.params._id;
+      const query = { _id: new ObjectId(id) };
+      const result = await productRequest.deleteOne(query);
       res.send(result);
     });
     // Send a ping to confirm a successful connection
