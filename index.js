@@ -22,6 +22,7 @@ const client = new MongoClient(uri, {
 const urbanDB = client.db("urbanDB");
 const productRequest = urbanDB.collection("productRequest");
 const products = urbanDB.collection("products");
+const reviewsCollection = urbanDB.collection('reviews');
 app.get("/", (req, res) => {
   res.send("Urban is Running!!");
 });
@@ -67,6 +68,16 @@ async function run() {
       const result = await productRequest.deleteOne(query);
       res.send(result);
     });
+    app.post('/reviews', async (req, res) => {
+      const review = req.body;
+      const result = await reviewsCollection.insertOne(review);
+      res.send(result);
+    })
+    app.get('/reviews', async (req, res) => {
+      const cursor = reviewsCollection.find();
+      const result = await cursor.toArray();
+      res.send(result)
+    })
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
     console.log(
