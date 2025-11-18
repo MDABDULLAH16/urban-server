@@ -23,6 +23,7 @@ const urbanDB = client.db("urbanDB");
 const productRequest = urbanDB.collection("productRequest");
 const products = urbanDB.collection("products");
 const reviewsCollection = urbanDB.collection('reviews');
+const categoryCollection = urbanDB.collection('category');
 app.get("/", (req, res) => {
   res.send("Urban is Running!!");
 });
@@ -36,15 +37,31 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
+    app.get("/categories", async (req, res) => {
+      const cursor = categoryCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
     app.get('/products/:id', async (req, res) => {
       const { id } = req.params;
       const query = { _id: new ObjectId(id) };
       const result = await products.findOne(query);
       res.send(result);
     })
+    app.get('/categories/:id', async (req, res) => {
+      const { id } = req.params;
+      const query = { _id: new ObjectId(id) };
+      const result = await categoryCollection.findOne(query);
+      res.send(result);
+    })
     app.post("/products", async (req, res) => {
       const newProduct = req.body;
       const result = await products.insertOne(newProduct);
+      res.send(result);
+    });
+    app.post("/categories", async (req, res) => {
+      const newCategory = req.body;
+      const result = await categoryCollection.insertOne(newCategory);
       res.send(result);
     });
     app.post("/productRequest", async (req, res) => {
