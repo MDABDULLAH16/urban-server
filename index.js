@@ -25,6 +25,7 @@ const products = urbanDB.collection("products");
 const reviewsCollection = urbanDB.collection('reviews');
 const categoryCollection = urbanDB.collection('category');
 const userCollection = urbanDB.collection('users');
+const cartCollection= urbanDB.collection('carts')
 app.get("/", (req, res) => {
   res.send("Urban is Running!!");
 });
@@ -60,9 +61,15 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
+    
     //users apis;
     app.post('/users', async (req, res) => {
       const user = req.body;
+      
+      const existingUser = await userCollection.findOne(user.email);
+      if (existingUser) {
+        return res.send({message:'user already exist!'})
+      }
       const result = await userCollection.insertOne(user);
       res.send(result);
     });
